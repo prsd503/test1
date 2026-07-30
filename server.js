@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
-const axios = require('axios');
 
 let privateKey = process.env.FIREBASE_PRIVATE_KEY;
 if (privateKey) {
@@ -18,12 +17,12 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
-const app = express(); // <-- Initialized here first
+const app = express();
 
 app.use(cors({ origin: 'https://prsd503.github.io' }));
 app.use(express.json());
 
-// Root welcome route (now placed after `app` is defined)
+// Root welcome route
 app.get('/', (req, res) => {
   res.status(200).send('Hello, World! Backend is running.');
 });
@@ -39,8 +38,7 @@ app.get('/api/get-data', async (req, res) => {
   }
 });
 
-// Example API endpoint with reCAPTCHA verification using your secret key
-// Replace your verify-recaptcha route with this:
+// Example API endpoint with reCAPTCHA verification using native fetch
 app.post('/api/verify-recaptcha', async (req, res) => {
   try {
     const { token } = req.body;
