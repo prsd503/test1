@@ -1,10 +1,7 @@
-app.get('/', (req, res) => {
-  res.status(200).send('Hello, World! Backend is running.');
-});
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
-const axios = require('axios'); // Optional, if you want to verify reCAPTCHA via API
+const axios = require('axios');
 
 let privateKey = process.env.FIREBASE_PRIVATE_KEY;
 if (privateKey) {
@@ -21,10 +18,15 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
-const app = express();
+const app = express(); // <-- Initialized here first
 
 app.use(cors({ origin: 'https://prsd503.github.io' }));
 app.use(express.json());
+
+// Root welcome route (now placed after `app` is defined)
+app.get('/', (req, res) => {
+  res.status(200).send('Hello, World! Backend is running.');
+});
 
 // Example API endpoint that fetches data from Firebase
 app.get('/api/get-data', async (req, res) => {
