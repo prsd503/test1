@@ -2,12 +2,17 @@ const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
+let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+if (privateKey) {
+  // Replace escaped newlines or literal escaped slash-n sequences
+  privateKey = privateKey.replace(/\\n/g, '\n');
+}
+
 admin.initializeApp({
   credential: admin.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    // Replace escaped newlines if copied from the private key string
-    privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined
+    privateKey: privateKey
   })
 });
 
