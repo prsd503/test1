@@ -12,7 +12,10 @@
 <h3>Guard Data Records:</h3>
 <div id="guards-container">Loading guards...</div>
 
-
+<script>
+  // Set debug token flag for local development
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+</script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
@@ -40,13 +43,14 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
 
-  // Only initialize App Check on localhost, bypass on GitHub Pages
+  // ONLY initialize App Check on localhost. Bypass on GitHub Pages to prevent 403 permission errors.
   if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
     try {
       initializeAppCheck(app, {
         provider: new ReCaptchaV3Provider("6Le9AW0tAAAAALbx3SGurJrHPWohLmrT1T7iJ1C"),
         isTokenAutoRefreshEnabled: true
       });
+      console.log("App Check initialized for local development.");
     } catch (e) {
       console.warn("App Check initialization skipped:", e);
     }
