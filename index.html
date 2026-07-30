@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase Test - Guards Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .guard-card { background: #f4f4f4; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<h3>Guard Data Records:</h3>
+<div id="guards-container">Loading guards...</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+  import {
+    initializeFirestore,
+    collection,
+    getDocs
+  } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  import {
+    initializeAppCheck,
+    ReCaptchaV3Provider,
+    getToken
+  } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app-check.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBn7gsoDDPEsLLS-09UFZnCETNhV5R_gQI",
+    authDomain: "test-c4a49.firebaseapp.com",
+    projectId: "test-c4a49",
+    storageBucket: "test-c4a49.firebasestorage.app",
+    messagingSenderId: "897880845291",
+    appId: "1:897880845291:web:55d424408781b88d7307ae",
+    measurementId: "G-87Z64Y29LE"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+
+  // Initialize App Check with your new reCAPTCHA site key
+  const appCheck = initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(
+      "6Le9AW0tAAAAALbx3SGurJrHPWohLmrT1T7iJ1C"
+    ),
+    isTokenAutoRefreshEnabled: true
+  });
+
+  try {
+    const token = await getToken(appCheck, true);
+    console.log("App Check token:", token.token);
+  } catch (error) {
+    console.error("Error fetching App Check token:", error);
+  }
+
+  const db = initializeFirestore(app, {
+    experimentalForceLongPolling: true,
+    useFetchStreams: false
+  });
+
+  async function loadItems() {
+    const container = document.getElementById("guards-container");
+    try {
+      const querySnapshot = await getDocs(collection(db, "guards"));
+      
+      if (querySnapshot.empty) {
+        container.innerHTML = "No documents found in 'guards' collection.";
+        return;
+      }
+
+      container.innerHTML = ""; // Clear loading text
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const card = document.createElement("div");
+        card.className = "guard-card";
+        card.innerHTML = `<strong>ID:</strong> ${doc.id}<br><strong>Data:</strong> ${JSON.stringify(data)}`;
+        container.appendChild(card);
+      });
+    } catch (error) {
+      console.error("Error loading items:", error);
+      container.innerHTML = "Error loading data. Check console for details.";
+    }
+  }
+
+  loadItems();
+</script>
+
+</body>
+</html>
