@@ -27,10 +27,10 @@ app.get('/', (req, res) => {
   res.status(200).send('Hello, World! Backend is running.');
 });
 
-// Example API endpoint that fetches data from Firebase
+// Fetches data from the 'guards' collection securely through the backend
 app.get('/api/get-data', async (req, res) => {
   try {
-    const snapshot = await db.collection('your-collection').get();
+    const snapshot = await db.collection('guards').get();
     const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     res.status(200).json(data);
   } catch (error) {
