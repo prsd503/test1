@@ -1,17 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Firebase Test - Guards Data</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .guard-card { background: #f4f4f4; padding: 10px; margin: 10px 0; border-radius: 5px; }
-    </style>
-</head>
-<body>
-
-<h3>Guard Data Records:</h3>
-<div id="guards-container">Loading guards...</div>
-
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
@@ -39,19 +25,14 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
 
-  // Initialize App Check with your new reCAPTCHA site key
-  const appCheck = initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider(
-      "6Le9AW0tAAAAALbx3SGurJrHPWohLmrT1T7iJ1B"
-    ),
-    isTokenAutoRefreshEnabled: true
-  });
-
+  // Safely initialize App Check only if not localhost, or wrap in try/catch so it never blocks data loading
   try {
-    const token = await getToken(appCheck, true);
-    console.log("App Check token:", token.token);
-  } catch (error) {
-    console.error("Error fetching App Check token:", error);
+    const appCheck = initializeAppCheck(app, {
+      provider: new ReCaptchaV3Provider("6Le9AW0tAAAAALbx3SGurJrHPWohLmrT1T7iJ1C"),
+      isTokenAutoRefreshEnabled: true
+    });
+  } catch (e) {
+    console.warn("App Check initialization skipped:", e);
   }
 
   const db = initializeFirestore(app, {
@@ -69,7 +50,7 @@
         return;
       }
 
-      container.innerHTML = ""; // Clear loading text
+      container.innerHTML = ""; 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const card = document.createElement("div");
@@ -85,6 +66,3 @@
 
   loadItems();
 </script>
-
-</body>
-</html>
