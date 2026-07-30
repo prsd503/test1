@@ -40,6 +40,7 @@ app.get('/api/get-data', async (req, res) => {
 });
 
 // Example API endpoint with reCAPTCHA verification using your secret key
+// Replace your verify-recaptcha route with this:
 app.post('/api/verify-recaptcha', async (req, res) => {
   try {
     const { token } = req.body;
@@ -50,11 +51,13 @@ app.post('/api/verify-recaptcha', async (req, res) => {
     const secretKey = process.env.RECAPTCHA_SECRET_KEY;
     const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`;
     
-    const response = await axios.post(verifyUrl);
-    if (response.data.success) {
+    const recaptchaRes = await fetch(verifyUrl, { method: 'POST' });
+    const data = await recaptchaRes.json();
+
+    if (data.success) {
       return res.status(200).json({ success: true, message: 'reCAPTCHA verified successfully' });
     } else {
-      return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed', errors: response.data['error-codes'] });
+      return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed', errors: data['error-codes'] });
     }
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
